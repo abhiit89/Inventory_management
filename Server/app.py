@@ -5,7 +5,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Table
 from sqlalchemy import create_engine
-
+from DBOperations import DBOperations
 import Constants
 
 app = Flask(__name__)
@@ -58,7 +58,6 @@ class GetAllItem(Resource):
     def get(self):
         try:
             args = request.args
-            from DBOperations import DBOperations
             data_list = DBOperations.get_item_list(args)
             return {'status': 'Product Gathered Successfully', 'data': data_list}
 

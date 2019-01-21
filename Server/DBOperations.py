@@ -1,4 +1,6 @@
 from sqlalchemy import create_engine, MetaData, select
+from Helpers import Helpers
+from Constants import Constants
 
 
 class DBOperations:
@@ -14,7 +16,6 @@ class DBOperations:
 
     @staticmethod
     def get_item_list(qp):
-        from Constants import Constants
         table = DBOperations.get_meta().tables[Constants.PRODUCT_TABLE]
         select_st = select([table])
         conn = DBOperations.get_db_engine().connect()
@@ -22,6 +23,5 @@ class DBOperations:
             select_st = select([table]).where(table.c.product_id == qp['item_id'])
 
         res = conn.execute(select_st)
-        from Helpers import Helpers
         data_list = Helpers.generate_list(res)
         return data_list

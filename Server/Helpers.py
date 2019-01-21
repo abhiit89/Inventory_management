@@ -6,5 +6,4 @@ class Helpers:
         for _row in res:
             row_as_dict = dict(_row)
             data_list.append(row_as_dict)
-            print(row_as_dict)
         return data_list
