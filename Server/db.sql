@@ -1,4 +1,4 @@
-CREATE TABLE `paytm_inventory_db`.`Item` (
+CREATE TABLE `paytm_inventory_db`.`productItem` (
 `ItemId` INT NOT NULL AUTO_INCREMENT,
 `name` VARCHAR(45) NULL,
 `brand` VARCHAR(45) NULL,

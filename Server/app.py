@@ -1,13 +1,19 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_restful import Resource, Api, reqparse
-from sqlalchemy import Column, MetaData, select
+from sqlalchemy import Column, MetaData, select, inspect
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Table
 from sqlalchemy import create_engine
+import Constants
 
 app = Flask(__name__)
 api = Api(app)
+
+
+def object_as_dict(obj):
+    return {c.key: getattr(obj, c.key)
+            for c in inspect(obj).mapper.column_attrs}
 
 
 class CreateItem(Resource):
@@ -22,7 +28,7 @@ class CreateItem(Resource):
             args = parser.parse_args()
             engine = create_engine('mysql+pymysql://root:my-secret-pw@192.168.99.100:32785/paytm_inventory_db')
             meta = MetaData(engine)
-            table = Table('productItem', meta,
+            table = Table(Constants.Constants.PRODUCT_TABLE, meta,
                           Column('product_id', Integer, primary_key=True, autoincrement=True, nullable=False),
                           Column('name', String(45)),
                           Column('brand', String(45)),
@@ -53,17 +59,19 @@ class GetAllItem(Resource):
             args = request.args
             engine = create_engine('mysql+pymysql://root:my-secret-pw@192.168.99.100:32785/paytm_inventory_db')
             meta = MetaData(engine, reflect=True)
-            table = meta.tables['productItem']
+            table = meta.tables[Constants.Constants.PRODUCT_TABLE]
             select_st = select([table])
             conn = engine.connect()
             if 'item_id' in args:
                 select_st = select([table]).where(table.c.product_id == args['item_id'])
 
             res = conn.execute(select_st)
+            data_list = []
             for _row in res:
-                print(_row)
-
-            return {'status': 'Product Gathered Successfully'}
+                row_as_dict = dict(_row)
+                data_list.append(row_as_dict)
+                print(row_as_dict)
+            return {'status': 'Product Gathered Successfully', 'data': data_list}
 
         except Exception as e:
             return {'error': str(e)}
