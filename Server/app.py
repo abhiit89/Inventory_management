@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
-from sqlalchemy import Column, MetaData, select, inspect
+from sqlalchemy import Column, MetaData, inspect
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Table
 from sqlalchemy import create_engine
+
 import Constants
 
 app = Flask(__name__)
@@ -57,20 +58,8 @@ class GetAllItem(Resource):
     def get(self):
         try:
             args = request.args
-            engine = create_engine('mysql+pymysql://root:my-secret-pw@192.168.99.100:32785/paytm_inventory_db')
-            meta = MetaData(engine, reflect=True)
-            table = meta.tables[Constants.Constants.PRODUCT_TABLE]
-            select_st = select([table])
-            conn = engine.connect()
-            if 'item_id' in args:
-                select_st = select([table]).where(table.c.product_id == args['item_id'])
-
-            res = conn.execute(select_st)
-            data_list = []
-            for _row in res:
-                row_as_dict = dict(_row)
-                data_list.append(row_as_dict)
-                print(row_as_dict)
+            from DBOperations import DBOperations
+            data_list = DBOperations.get_item_list(args)
             return {'status': 'Product Gathered Successfully', 'data': data_list}
 
         except Exception as e:
